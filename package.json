@@ -1,6 +1,6 @@
 {
   "name": "python-import-copier",
-  "displayName": "Antigravity Python Import Helper",
+  "displayName": "Python Import Copier",
   "description": "Copy Python import paths instantly",
   "version": "0.0.1",
   "publisher": "Suraj1089",
@@ -19,8 +19,16 @@
   "engines": {
     "vscode": "^1.85.0"
   },
+  "files": [
+    "out/**/*",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
   "main": "./out/extension.js",
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:python-import-copier.copyPythonImport"
+  ],
   "contributes": {
     "commands": [
       {
@@ -50,7 +58,9 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "compile-tests": "tsc -p ./tsconfig.test.json",
+    "test": "npm run compile-tests && node --test out-test/test"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",

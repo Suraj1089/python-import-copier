@@ -1,11 +1,16 @@
-import * as path from 'path';
 import * as vscode from 'vscode';
+import {
+  extractSymbolNameFromLine,
+  normalizeSourceRoot,
+  toPythonModulePath,
+} from './core';
 
 type DefinitionResult = vscode.Location | vscode.LocationLink;
+const COMMAND_ID = 'python-import-copier.copyPythonImport';
 
 export function activate(context: vscode.ExtensionContext): void {
   const disposable = vscode.commands.registerCommand(
-    'python-import-copier.copyPythonImport',
+    COMMAND_ID,
     async () => {
       try {
         await copyPythonImport();
@@ -13,7 +18,7 @@ export function activate(context: vscode.ExtensionContext): void {
         const message =
           error instanceof Error ? error.message : 'Unknown error';
         void vscode.window.showErrorMessage(
-          `Antigravity: Could not copy import. ${message}`,
+          `Python Import Copier: Could not copy import. ${message}`,
         );
       }
     },
@@ -56,12 +61,21 @@ async function copyPythonImport(): Promise<void> {
     definitionUri.fsPath,
     workspaceFolder.uri.fsPath,
     sourceRoot,
+    {
+      workspacePackageName: pathBasename(workspaceFolder.uri.fsPath),
+      platform: process.platform,
+    },
   );
 
   if (!modulePath) {
-    throw new Error(
-      'Could not determine a Python module path from the definition file.',
-    );
+    const rootInitPath = vscode.Uri.joinPath(workspaceFolder.uri, '__init__.py')
+      .fsPath;
+    if (definitionUri.fsPath === rootInitPath) {
+      throw new Error(
+        'Definition points to a workspace-root __init__.py. Rename the workspace folder to a valid Python package name or set a source root that maps to a package directory.',
+      );
+    }
+    throw new Error('Could not determine a Python module path.');
   }
 
   const symbolName = await resolveSymbolName(definition, editor);
@@ -219,98 +233,16 @@ function rangeSize(range: vscode.Range): number {
   );
 }
 
-function extractSymbolNameFromLine(line: string): string | undefined {
-  const patterns = [
-    /^\s*def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(/,
-    /^\s*class\s+([A-Za-z_][A-Za-z0-9_]*)\s*[\(:]/,
-    /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?::[^=]+)?=/,
-    /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*:\s*[^=]+$/,
-  ];
-
-  for (const pattern of patterns) {
-    const match = line.match(pattern);
-    if (match?.[1]) {
-      return match[1];
-    }
-  }
-
-  return undefined;
-}
-
 function getConfiguredSourceRoot(): string {
-  const raw = vscode.workspace
+  return normalizeSourceRoot(
+    vscode.workspace
     .getConfiguration('python-import-copier')
-    .get<string>('pythonSourceRoot', '')
-    .trim();
-  if (!raw) {
-    return '';
-  }
-
-  // Normalize settings like "src/" or "\\src\\" into clean path segments.
-  const normalized = path.normalize(raw).replace(/^([/\\])+|([/\\])+$/g, '');
-  return normalized;
+      .get<string>('pythonSourceRoot', ''),
+  );
 }
 
-function toPythonModulePath(
-  filePath: string,
-  workspaceRootPath: string,
-  sourceRoot: string,
-): string | undefined {
-  const relativePath = path.relative(workspaceRootPath, filePath);
-  if (
-    !relativePath ||
-    relativePath.startsWith('..') ||
-    path.isAbsolute(relativePath)
-  ) {
-    return undefined;
-  }
-
-  const relativeDir = path.dirname(relativePath);
-  const baseName = path.basename(relativePath);
-  const ext = path.extname(baseName);
-  const stem = ext ? baseName.slice(0, -ext.length) : baseName;
-
-  const isPythonFile = ext === '.py' || ext === '.pyi';
-  if (!isPythonFile) {
-    return undefined;
-  }
-
-  const segments = splitPath(relativeDir);
-  if (sourceRoot) {
-    const sourceSegments = splitPath(sourceRoot);
-    if (hasPrefix(segments, sourceSegments)) {
-      segments.splice(0, sourceSegments.length);
-    }
-  }
-
-  if (stem !== '__init__') {
-    segments.push(stem);
-  }
-
-  return segments.length > 0 ? segments.join('.') : undefined;
-}
-
-function splitPath(input: string): string[] {
-  if (!input || input === '.') {
-    return [];
-  }
-
-  return input.split(/[\\/]+/).filter(Boolean);
-}
-
-function hasPrefix(
-  input: readonly string[],
-  prefix: readonly string[],
-): boolean {
-  if (prefix.length === 0 || prefix.length > input.length) {
-    return false;
-  }
-
-  for (let i = 0; i < prefix.length; i += 1) {
-    if (input[i] !== prefix[i]) {
-      return false;
-    }
-  }
-
-  return true;
+function pathBasename(fsPath: string): string {
+  const normalized = fsPath.replace(/[\\/]+$/, '');
+  const segments = normalized.split(/[\\/]+/).filter(Boolean);
+  return segments[segments.length - 1] ?? '';
 }

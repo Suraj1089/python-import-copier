@@ -60,8 +60,12 @@ If your project uses a `src`-layout, set this to strip the source directory pref
 2. Resolves the symbol definition via `vscode.executeDefinitionProvider`
 3. Locates the workspace folder containing the definition file
 4. Converts the file path to a Python module path (handles `__init__.py` automatically)
-5. Determines the symbol name using document symbols, then falls back to line parsing
+5. Determines the symbol name using document symbols, then falls back to line parsing (supports `async def`)
 6. Builds `from <module> import <symbol>`, copies it to the clipboard, and shows a notification
+
+### Workspace root `__init__.py`
+
+If a definition resolves to `<workspace>/__init__.py`, Python Import Copier maps it to the workspace folder name when that name is a valid Python identifier.
 
 ## 🛠️ Development
 
@@ -80,7 +84,7 @@ Press **`F5`** in VS Code to launch the Extension Development Host for testing.
 
 ### Publishing
 
-This project uses [GitHub Actions](.github/workflows/publish.yml) to automatically publish to [Open VSX](https://open-vsx.org/) on every push to `main`.
+This project uses [GitHub Actions](.github/workflows/publish.yml) to publish to [Open VSX](https://open-vsx.org/) on release publication.
 
 To publish manually:
 

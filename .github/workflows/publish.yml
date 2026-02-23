@@ -1,10 +1,9 @@
 name: Publish to Open VSX
 
 on:
-  push:
-    branches: [main]
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -24,8 +23,12 @@ jobs:
       - name: Compile
         run: npm run compile
 
+      - name: Run tests
+        run: npm test
+
       - name: Package extension
         run: npx @vscode/vsce package
 
       - name: Publish to Open VSX
-        run: npx ovsx publish *.vsix -p ${{ secrets.OVSX_PAT }}
+        if: ${{ secrets.OVSX_PAT != '' }}
+        run: npx ovsx publish *.vsix -p "${{ secrets.OVSX_PAT }}"

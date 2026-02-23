@@ -1,8 +1,14 @@
 .vscode/**
 src/**
+test/**
 tsconfig.json
+tsconfig.test.json
 .gitignore
 .github/**
+.env
+.npm-cache/**
+out-test/**
+*.vsix
 **/*.map
 **/*.ts
 node_modules/.cache/**

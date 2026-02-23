@@ -4,3 +4,5 @@ out/
 .env
 .ovsx
 .vscode-test/
+.npm-cache/
+out-test/
