@@ -1,0 +1,60 @@
+{
+  "name": "python-import-copier",
+  "displayName": "Antigravity Python Import Helper",
+  "description": "Copy Python import paths instantly",
+  "version": "0.0.1",
+  "publisher": "Suraj1089",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Suraj1089/python-import-copier"
+  },
+  "bugs": {
+    "url": "https://github.com/Suraj1089/python-import-copier/issues"
+  },
+  "homepage": "https://github.com/Suraj1089/python-import-copier#readme",
+  "categories": [
+    "Other"
+  ],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "main": "./out/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "commands": [
+      {
+        "command": "python-import-copier.copyPythonImport",
+        "title": "Python Import Copier: Copy Python Import"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "python-import-copier.copyPythonImport",
+        "key": "ctrl+u",
+        "mac": "cmd+u",
+        "when": "editorTextFocus && editorLangId == python"
+      }
+    ],
+    "configuration": {
+      "title": "Python Import Copier",
+      "properties": {
+        "python-import-copier.pythonSourceRoot": {
+          "type": "string",
+          "default": "",
+          "description": "Optional source root folder (for example: src). If set, this prefix is removed when generating Python module paths."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.4.2"
+  }
+}
