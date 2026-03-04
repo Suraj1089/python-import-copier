@@ -32,12 +32,6 @@
   "engines": {
     "vscode": "^1.85.0"
   },
-  "files": [
-    "out/**/*",
-    "package.json",
-    "README.md",
-    "LICENSE"
-  ],
   "main": "./out/extension.js",
   "activationEvents": [
     "onCommand:python-import-copier.copyPythonImport"
