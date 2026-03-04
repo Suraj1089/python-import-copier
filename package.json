@@ -2,6 +2,18 @@
   "name": "python-import-copier",
   "displayName": "Python Import Copier",
   "description": "Copy Python import paths instantly",
+  "keywords": [
+    "python",
+    "import",
+    "copy",
+    "antigravity",
+    "module",
+    "clipboard",
+    "auto import",
+    "python import",
+    "import helper",
+    "import path"
+  ],
   "version": "0.0.1",
   "publisher": "Suraj1089",
   "license": "MIT",
@@ -14,7 +26,8 @@
   },
   "homepage": "https://github.com/Suraj1089/python-import-copier#readme",
   "categories": [
-    "Other"
+    "Programming Languages",
+    "Keybindings"
   ],
   "engines": {
     "vscode": "^1.85.0"

@@ -1,4 +1,4 @@
-name: Publish to Open VSX
+name: Publish Extension
 
 on:
   push:
@@ -47,3 +47,7 @@ jobs:
       - name: Publish to Open VSX
         if: ${{ secrets.OVSX_PAT != '' }}
         run: npx ovsx publish *.vsix -p "${{ secrets.OVSX_PAT }}"
+
+      - name: Publish to VS Code Marketplace
+        if: ${{ secrets.VSCE_PAT != '' }}
+        run: npx @vscode/vsce publish -p "${{ secrets.VSCE_PAT }}"
