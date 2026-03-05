@@ -14,7 +14,7 @@
     "import helper",
     "import path"
   ],
-  "version": "0.0.3",
+  "version": "0.0.4",
   "icon": "images/icon.png",
   "publisher": "Suraj1089",
   "license": "MIT",
@@ -34,9 +34,7 @@
     "vscode": "^1.85.0"
   },
   "main": "./out/extension.js",
-  "activationEvents": [
-    
-  ],
+  "activationEvents": [],
   "contributes": {
     "commands": [
       {
