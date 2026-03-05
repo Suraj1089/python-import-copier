@@ -9,20 +9,16 @@ type DefinitionResult = vscode.Location | vscode.LocationLink;
 const COMMAND_ID = 'python-import-copier.copyPythonImport';
 
 export function activate(context: vscode.ExtensionContext): void {
-  const disposable = vscode.commands.registerCommand(
-    COMMAND_ID,
-    async () => {
-      try {
-        await copyPythonImport();
-      } catch (error) {
-        const message =
-          error instanceof Error ? error.message : 'Unknown error';
-        void vscode.window.showErrorMessage(
-          `Python Import Copier: Could not copy import. ${message}`,
-        );
-      }
-    },
-  );
+  const disposable = vscode.commands.registerCommand(COMMAND_ID, async () => {
+    try {
+      await copyPythonImport();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      void vscode.window.showErrorMessage(
+        `Python Import Copier: Could not copy import. ${message}`,
+      );
+    }
+  });
 
   context.subscriptions.push(disposable);
 }
@@ -68,8 +64,10 @@ async function copyPythonImport(): Promise<void> {
   );
 
   if (!modulePath) {
-    const rootInitPath = vscode.Uri.joinPath(workspaceFolder.uri, '__init__.py')
-      .fsPath;
+    const rootInitPath = vscode.Uri.joinPath(
+      workspaceFolder.uri,
+      '__init__.py',
+    ).fsPath;
     if (definitionUri.fsPath === rootInitPath) {
       throw new Error(
         'Definition points to a workspace-root __init__.py. Rename the workspace folder to a valid Python package name or set a source root that maps to a package directory.',
@@ -85,9 +83,16 @@ async function copyPythonImport(): Promise<void> {
 
   const importStatement = `from ${modulePath} import ${symbolName}`;
   await vscode.env.clipboard.writeText(importStatement);
-  void vscode.window.showInformationMessage(
-    `Copied Python import: ${importStatement}`,
-  );
+
+  const showNotification = vscode.workspace
+    .getConfiguration('python-import-copier')
+    .get<boolean>('showCopyNotification', true);
+
+  if (showNotification) {
+    void vscode.window.showInformationMessage(
+      `Copied Python import: ${importStatement}`,
+    );
+  }
 }
 
 async function getBestDefinition(
@@ -236,7 +241,7 @@ function rangeSize(range: vscode.Range): number {
 function getConfiguredSourceRoot(): string {
   return normalizeSourceRoot(
     vscode.workspace
-    .getConfiguration('python-import-copier')
+      .getConfiguration('python-import-copier')
       .get<string>('pythonSourceRoot', ''),
   );
 }

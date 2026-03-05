@@ -15,6 +15,7 @@
     "import path"
   ],
   "version": "0.0.3",
+  "icon": "images/icon.png",
   "publisher": "Suraj1089",
   "license": "MIT",
   "repository": {
@@ -34,7 +35,7 @@
   },
   "main": "./out/extension.js",
   "activationEvents": [
-    "onCommand:python-import-copier.copyPythonImport"
+    
   ],
   "contributes": {
     "commands": [
@@ -58,6 +59,11 @@
           "type": "string",
           "default": "",
           "description": "Optional source root folder (for example: src). If set, this prefix is removed when generating Python module paths."
+        },
+        "python-import-copier.showCopyNotification": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a status bar notification after copying a Python import statement. Set to false to disable."
         }
       }
     }
